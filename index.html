@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLOWERROR — ошибка, которая красивее правил</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== RESET ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --blue: #0900FF;
+      --blue-light: #8B9EFF;
+      --orange: #FF6B35;
+      --white: #FFFFFF;
+      --bg: #FAFAFA;
+      --text: #111111;
+      --text-secondary: #6c6c6c;
+      --border: #E0E0E0;
+      --font-logo: 'Nunito', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    button { cursor: pointer; border: none; font-family: inherit; }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-full {
+      height: 44px;
+      width: auto;
+    }
+
+    .nav { display: flex; align-items: center; gap: 32px; }
+
+    .nav a {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+
+    .nav a:hover { color: var(--blue); }
+
+    .nav-socials { display: flex; gap: 16px; align-items: center; }
+
+    .nav-socials a {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+
+    .nav-socials a:hover { transform: scale(1.1); }
+
+    .nav-socials svg { width: 18px; height: 18px; fill: var(--white); }
+
+    .burger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      padding: 8px;
+    }
+
+    .burger span {
+      width: 24px;
+      height: 2px;
+      background: var(--text);
+      transition: 0.3s;
+    }
+
+    /* ===== MOBILE MENU ===== */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--blue);
+      z-index: 200;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    .mobile-menu.active { display: flex; }
+
+    .mobile-menu a {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .mobile-menu-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      background: none;
+      font-size: 36px;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      margin-top: 70px;
+      min-height: calc(100vh - 70px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 24px;
+      background: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-flower {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      opacity: 0.08;
+      animation: spin 30s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .hero-tagline {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-family: var(--font-logo);
+      font-size: 72px;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.1;
+      max-width: 800px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 span { color: var(--blue); }
+
+    .hero-sub {
+      font-size: 20px;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin-bottom: 48px;
+      line-height: 1.6;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue);
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 50px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(9, 0, 255, 0.3);
+    }
+
+    /* ===== ABOUT ===== */
+    .about {
+      padding: 120px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-family: var(--font-logo);
+      font-size: 48px;
+      font-weight: 900;
+      color: var(--blue);
+      margin-bottom: 60px;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .about-card {
+      padding: 40px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--white);
+      transition: transform 0.2s;
+    }
+
+    .about-card:hover { transform: translateY(-4px); }
+
+    .about-card h3 {
+      font-family: var(--font-logo);
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .about-card p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .about-card .icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    /* ===== CATALOG ===== */
+    .catalog {
+      padding: 120px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .product-card {
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+    }
+
+    .product-img {
+      width: 100%;
+      aspect-ratio: 1;
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .product-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s;
+    }
+
+    .product-card:hover .product-img img { transform: scale(1.05); }
+
+    .product-info {
+      padding: 20px;
+    }
+
+    .product-name {
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .product-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .product-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .product-price {
+      font-family: var(--font-logo);
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--blue);
+    }
+
+    .btn-cart {
+      background: var(--blue);
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 24px;
+      border-radius: 50px;
+      transition: transform 0.2s;
+    }
+
+    .btn-cart:hover { transform: scale(1.05); }
+
+    /* ===== COMPARISON ===== */
+    .comparison {
+      padding: 120px 40px;
+      background: var(--white);
+    }
+
+    .comparison-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr;
+      gap: 0;
+      align-items: stretch;
+    }
+
+    .compare-col {
+      padding: 48px;
+      border-radius: 16px;
+    }
+
+    .compare-col.old {
+      background: #f5f5f5;
+      border: 1px solid var(--border);
+    }
+
+    .compare-col.new {
+      background: var(--blue);
+      color: var(--white);
+    }
+
+    .compare-col h3 {
+      font-family: var(--font-logo);
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 32px;
+    }
+
+    .compare-col.new h3 { color: var(--white); }
+
+    .compare-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .compare-col ul li {
+      font-size: 16px;
+      line-height: 1.6;
+      padding-left: 28px;
+      position: relative;
+    }
+
+    .compare-col.old ul li::before {
+      content: '✕';
+      position: absolute;
+      left: 0;
+      color: #cc0000;
+      font-weight: 700;
+    }
+
+    .compare-col.new ul li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #7FFFB2;
+      font-weight: 700;
+    }
+
+    .compare-vs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .compare-vs span {
+      font-family: var(--font-logo);
+      font-weight: 900;
+      font-size: 24px;
+      color: var(--blue);
+    }
+
+    /* ===== ORDER FORM ===== */
+    .order {
+      padding: 120px 40px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .order-form {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 15px;
+      font-family: var(--font-body);
+      transition: border-color 0.2s;
+      background: var(--bg);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--blue);
+    }
+
+    .form-group textarea { resize: vertical; min-height: 100px; }
+
+    .order-form .btn-primary {
+      width: 100%;
+      justify-content: center;
+      margin-top: 8px;
+      font-size: 18px;
+      padding: 18px;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background: var(--text);
+      color: var(--white);
+      padding: 60px 40px 30px;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 40px;
+    }
+
+    .footer-col h4 {
+      font-family: var(--font-logo);
+      font-weight: 800;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    .footer-col p,
+    .footer-col a {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      line-height: 2;
+    }
+
+    .footer-col a:hover { color: var(--white); }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 40px auto 0;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 960px) {
+      .nav { display: none; }
+      .burger { display: flex; }
+      .header { padding: 0 20px; }
+
+      .hero h1 { font-size: 48px; }
+      .hero-sub { font-size: 17px; }
+
+      .about-grid { grid-template-columns: 1fr; gap: 20px; }
+      .catalog-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .about, .catalog, .order { padding: 80px 20px; }
+      .comparison { padding: 80px 20px; }
+      .section-title { font-size: 36px; margin-bottom: 40px; }
+
+      .comparison-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .compare-vs { padding: 8px 0; }
+      .compare-vs span { font-size: 20px; }
+
+      .footer-inner { grid-template-columns: 1fr; gap: 24px; }
+    }
+
+    @media (max-width: 640px) {
+      .hero { padding: 60px 20px; min-height: 80vh; }
+      .hero h1 { font-size: 36px; }
+      .hero-tagline { font-size: 13px; letter-spacing: 2px; }
+      .hero-flower { width: 250px; height: 250px; }
+
+      .catalog-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .order-form { padding: 24px; }
+      .about-card { padding: 24px; }
+      .compare-col { padding: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <a href="#" class="logo">
+      <svg class="logo-full" viewBox="0 0 360 80" xmlns="http://www.w3.org/2000/svg">
+        <!-- Flower element — 4-petal shape, tilted, behind text -->
+        <g transform="translate(68, 40) rotate(-15)">
+          <path d="M0 -32 C12 -28, 20 -16, 20 0 C20 16, 12 28, 0 32 C-12 28, -20 16, -20 0 C-20 -16, -12 -28, 0 -32Z" fill="#8B9EFF" opacity="0.7" transform="rotate(0)"/>
+          <path d="M0 -32 C12 -28, 20 -16, 20 0 C20 16, 12 28, 0 32 C-12 28, -20 16, -20 0 C-20 -16, -12 -28, 0 -32Z" fill="#8B9EFF" opacity="0.7" transform="rotate(90)"/>
+          <circle cx="0" cy="0" r="5" fill="#FF6B35"/>
+        </g>
+        <!-- Text FLOWERROR -->
+        <text x="95" y="58" font-family="'Nunito', 'Baloo 2', sans-serif" font-weight="900" font-size="52" fill="#0900FF" letter-spacing="-1">
+          FL<tspan>O</tspan>WERR<tspan>O</tspan>R
+        </text>
+        <!-- Orange dot inside first O -->
+        <circle cx="145.5" cy="46" r="4" fill="#FF6B35"/>
+      </svg>
+    </a>
+
+    <nav class="nav">
+      <a href="#catalog">охапки</a>
+      <a href="#about">о нас</a>
+      <a href="#order">заказать</a>
+      <div class="nav-socials">
+        <a href="#" aria-label="Telegram">
+          <svg viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+        </a>
+        <a href="#" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+      </div>
+    </nav>
+
+    <button class="burger" onclick="document.querySelector('.mobile-menu').classList.add('active')">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu">
+    <button class="mobile-menu-close" onclick="this.parentElement.classList.remove('active')">&times;</button>
+    <a href="#catalog" onclick="this.parentElement.classList.remove('active')">охапки</a>
+    <a href="#about" onclick="this.parentElement.classList.remove('active')">о нас</a>
+    <a href="#order" onclick="this.parentElement.classList.remove('active')">заказать</a>
+    <a href="#">telegram</a>
+    <a href="#">instagram</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <svg class="hero-flower" viewBox="0 0 100 100" fill="none">
+      <g transform="translate(50, 50) rotate(-15)">
+        <path d="M0 -40 C15 -35, 25 -20, 25 0 C25 20, 15 35, 0 40 C-15 35, -25 20, -25 0 C-25 -20, -15 -35, 0 -40Z" fill="var(--blue)" transform="rotate(0)"/>
+        <path d="M0 -40 C15 -35, 25 -20, 25 0 C25 20, 15 35, 0 40 C-15 35, -25 20, -25 0 C-25 -20, -15 -35, 0 -40Z" fill="var(--blue)" transform="rotate(90)"/>
+      </g>
+    </svg>
+    <p class="hero-tagline">цветы охапками · минск</p>
+    <h1>ошибка, которая <span>красивее</span> правил</h1>
+    <p class="hero-sub">Охапки сезонных цветов без целлофана, без бантов и без повода. Только цветы — и ничего лишнего.</p>
+    <a href="#catalog" class="btn-primary">смотреть охапки →</a>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <h2 class="section-title">почему flowerror?</h2>
+    <div class="about-grid">
+      <div class="about-card">
+        <div class="icon">🌿</div>
+        <h3>свежесть без обещаний</h3>
+        <p>Закупаем цветы в день сборки. Никаких «свежайших роз» недельной давности — только то, что приехало сегодня.</p>
+      </div>
+      <div class="about-card">
+        <div class="icon">✕</div>
+        <h3>эстетика без упаковки</h3>
+        <p>Целлофан, блёстки и банты — не наш формат. Охапка перевязана лентой и доставлена в коробке. Всё.</p>
+      </div>
+      <div class="about-card">
+        <div class="icon">💸</div>
+        <h3>цветы, а не обёртка</h3>
+        <p>Вы платите за цветы, а не за упаковку. На 30-40% дешевле обычного букета — потому что деньги идут на стебли, а не на целлофан.</p>
+      </div>
+      <div class="about-card">
+        <div class="icon">📦</div>
+        <h3>доставка без шума</h3>
+        <p>Привозим по Минску в удобное время. Написали в Telegram — собрали — доставили. Без лишних звонков и формальностей.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section class="comparison">
+    <div class="comparison-inner">
+      <h2 class="section-title">в чём разница?</h2>
+      <div class="comparison-grid">
+        <div class="compare-col old">
+          <h3>обычный букет</h3>
+          <ul>
+            <li>целлофан + бант + блёстки</li>
+            <li>40% цены — это упаковка</li>
+            <li>стандартные розы и хризантемы</li>
+            <li>выглядит как подарок из ларька</li>
+            <li>обёртку выбросишь через 5 минут</li>
+            <li>90-120 BYN</li>
+          </ul>
+        </div>
+        <div class="compare-vs"><span>vs</span></div>
+        <div class="compare-col new">
+          <h3>охапка flowerror</h3>
+          <ul>
+            <li>только цветы и лента</li>
+            <li>100% цены — это цветы</li>
+            <li>сезонные, авторский подбор</li>
+            <li>выглядит как из поля в Провансе</li>
+            <li>нечего выбрасывать</li>
+            <li>60-80 BYN</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATALOG -->
+  <section class="catalog" id="catalog">
+    <h2 class="section-title">[сезонные]</h2>
+    <div class="catalog-grid">
+
+      <div class="product-card">
+        <div class="product-img">
+          <img src="https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=600&h=600&fit=crop" alt="Охапка лавандовая">
+        </div>
+        <div class="product-info">
+          <div class="product-name">лавандовый закат</div>
+          <div class="product-desc">эустома, маттиола, эвкалипт бейби блю</div>
+          <div class="product-bottom">
+            <span class="product-price">75 BYN</span>
+            <button class="btn-cart">заказать</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">
+          <img src="https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=600&h=600&fit=crop" alt="Охапка розовая">
+        </div>
+        <div class="product-info">
+          <div class="product-name">розовый шум</div>
+          <div class="product-desc">гортензия розовая, диантус, ранункулюс белый</div>
+          <div class="product-bottom">
+            <span class="product-price">85 BYN</span>
+            <button class="btn-cart">заказать</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">
+          <img src="https://images.unsplash.com/photo-1468327768560-75b778cbb551?w=600&h=600&fit=crop" alt="Охапка полевая">
+        </div>
+        <div class="product-info">
+          <div class="product-name">полевой сбой</div>
+          <div class="product-desc">хризантема код грин, антирринум, эрингиум</div>
+          <div class="product-bottom">
+            <span class="product-price">65 BYN</span>
+            <button class="btn-cart">заказать</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">
+          <img src="https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=600&h=600&fit=crop" alt="Охапка экзотика">
+        </div>
+        <div class="product-info">
+          <div class="product-name">тропический баг</div>
+          <div class="product-desc">протея, леукоспермум, антуриум, леукадендрон</div>
+          <div class="product-bottom">
+            <span class="product-price">110 BYN</span>
+            <button class="btn-cart">заказать</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">
+          <img src="https://images.unsplash.com/photo-1525310379050-9a1b1b7c63ea?w=600&h=600&fit=crop" alt="Охапка нежная">
+        </div>
+        <div class="product-info">
+          <div class="product-name">нежный сбой</div>
+          <div class="product-desc">хризантема момоко, эустома розовая, диантус киви</div>
+          <div class="product-bottom">
+            <span class="product-price">70 BYN</span>
+            <button class="btn-cart">заказать</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">
+          <img src="https://images.unsplash.com/photo-1509587584298-0f3b3a3a1797?w=600&h=600&fit=crop" alt="Охапка белая">
+        </div>
+        <div class="product-info">
+          <div class="product-name">белый шум</div>
+          <div class="product-desc">калла, ранункулюс белый, хризантема зефир, эвкалипт</div>
+          <div class="product-bottom">
+            <span class="product-price">90 BYN</span>
+            <button class="btn-cart">заказать</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ORDER FORM -->
+  <section class="order" id="order">
+    <h2 class="section-title">оформить заказ</h2>
+    <form class="order-form" onsubmit="event.preventDefault(); alert('Заказ отправлен! Мы свяжемся с вами в Telegram.')">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>ваше имя</label>
+          <input type="text" placeholder="Анна" required>
+        </div>
+        <div class="form-group">
+          <label>телефон</label>
+          <input type="tel" placeholder="+375 29 123 45 67" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>имя получателя</label>
+          <input type="text" placeholder="если отличается">
+        </div>
+        <div class="form-group">
+          <label>телефон получателя</label>
+          <input type="tel" placeholder="+375 ...">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>адрес доставки</label>
+        <input type="text" placeholder="ул. Немига, 12, кв. 34" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>дата доставки</label>
+          <input type="date" required>
+        </div>
+        <div class="form-group">
+          <label>время</label>
+          <select required>
+            <option value="">выберите</option>
+            <option>10:00 — 14:00</option>
+            <option>14:00 — 18:00</option>
+            <option>18:00 — 21:00</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>комментарий</label>
+        <textarea placeholder="пожелания по цветам, аллергии, сюрприз..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>связь через</label>
+        <select>
+          <option>Telegram</option>
+          <option>Позвонить</option>
+          <option>Instagram Direct</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-primary">отправить заказ</button>
+    </form>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4>FLOWERROR</h4>
+        <p>ошибка, которая красивее правил</p>
+        <p style="margin-top:12px;">Минск, Беларусь</p>
+      </div>
+      <div class="footer-col">
+        <h4>навигация</h4>
+        <a href="#catalog">охапки</a><br>
+        <a href="#about">о нас</a><br>
+        <a href="#order">заказать</a>
+      </div>
+      <div class="footer-col">
+        <h4>связаться</h4>
+        <a href="#">Telegram →</a><br>
+        <a href="#">Instagram →</a><br>
+        <a href="tel:+375291234567">+375 29 123 45 67</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 FLOWERROR. живое не упаковывают.
+    </div>
+  </footer>
+
+</body>
+</html>
