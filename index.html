@@ -564,6 +564,15 @@
       .footer-inner { grid-template-columns: 1fr; gap: 24px; }
     }
 
+    .catalog-spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
     @media (max-width: 640px) {
       .hero { padding: 60px 20px; min-height: 80vh; }
       .hero h1 { font-size: 36px; }
@@ -629,6 +638,16 @@
     <a href="#catalog" class="btn-primary">смотреть охапки →</a>
   </section>
 
+  <!-- CATALOG -->
+  <section class="catalog" id="catalog">
+    <h2 class="section-title">[сезонные]</h2>
+    <div class="catalog-grid" id="catalog-grid">
+      <div style="grid-column:1/-1;display:flex;justify-content:center;padding:40px 0">
+        <div class="catalog-spinner"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- ABOUT -->
   <section class="about" id="about">
     <h2 class="section-title">почему flowerror?</h2>
@@ -685,98 +704,6 @@
           </ul>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- CATALOG -->
-  <section class="catalog" id="catalog">
-    <h2 class="section-title">[сезонные]</h2>
-    <div class="catalog-grid">
-
-      <div class="product-card">
-        <div class="product-img">
-          <img src="https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=600&h=600&fit=crop" alt="Охапка лавандовая">
-        </div>
-        <div class="product-info">
-          <div class="product-name">лавандовый закат</div>
-          <div class="product-desc">эустома, маттиола, эвкалипт бейби блю</div>
-          <div class="product-bottom">
-            <span class="product-price">75 BYN</span>
-            <button class="btn-cart">заказать</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="product-card">
-        <div class="product-img">
-          <img src="https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=600&h=600&fit=crop" alt="Охапка розовая">
-        </div>
-        <div class="product-info">
-          <div class="product-name">розовый шум</div>
-          <div class="product-desc">гортензия розовая, диантус, ранункулюс белый</div>
-          <div class="product-bottom">
-            <span class="product-price">85 BYN</span>
-            <button class="btn-cart">заказать</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="product-card">
-        <div class="product-img">
-          <img src="https://images.unsplash.com/photo-1468327768560-75b778cbb551?w=600&h=600&fit=crop" alt="Охапка полевая">
-        </div>
-        <div class="product-info">
-          <div class="product-name">полевой сбой</div>
-          <div class="product-desc">хризантема код грин, антирринум, эрингиум</div>
-          <div class="product-bottom">
-            <span class="product-price">65 BYN</span>
-            <button class="btn-cart">заказать</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="product-card">
-        <div class="product-img">
-          <img src="https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=600&h=600&fit=crop" alt="Охапка экзотика">
-        </div>
-        <div class="product-info">
-          <div class="product-name">тропический баг</div>
-          <div class="product-desc">протея, леукоспермум, антуриум, леукадендрон</div>
-          <div class="product-bottom">
-            <span class="product-price">110 BYN</span>
-            <button class="btn-cart">заказать</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="product-card">
-        <div class="product-img">
-          <img src="https://images.unsplash.com/photo-1525310379050-9a1b1b7c63ea?w=600&h=600&fit=crop" alt="Охапка нежная">
-        </div>
-        <div class="product-info">
-          <div class="product-name">нежный сбой</div>
-          <div class="product-desc">хризантема момоко, эустома розовая, диантус киви</div>
-          <div class="product-bottom">
-            <span class="product-price">70 BYN</span>
-            <button class="btn-cart">заказать</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="product-card">
-        <div class="product-img">
-          <img src="https://images.unsplash.com/photo-1509587584298-0f3b3a3a1797?w=600&h=600&fit=crop" alt="Охапка белая">
-        </div>
-        <div class="product-info">
-          <div class="product-name">белый шум</div>
-          <div class="product-desc">калла, ранункулюс белый, хризантема зефир, эвкалипт</div>
-          <div class="product-bottom">
-            <span class="product-price">90 BYN</span>
-            <button class="btn-cart">заказать</button>
-          </div>
-        </div>
-      </div>
-
     </div>
   </section>
 
@@ -872,5 +799,49 @@
     </div>
   </footer>
 
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function esc(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    db.collection('products').orderBy('createdAt', 'desc').get().then(snap => {
+      const grid = document.getElementById('catalog-grid');
+      if (snap.empty) {
+        grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:40px 0">Скоро появятся новые охапки</p>';
+        return;
+      }
+      grid.innerHTML = snap.docs.map(d => {
+        const p = d.data();
+        return `
+          <div class="product-card">
+            <div class="product-img">
+              <img src="${esc(p.imageUrl)}" alt="${esc(p.name)}" loading="lazy">
+            </div>
+            <div class="product-info">
+              <div class="product-name">${esc(p.name)}</div>
+              <div class="product-desc">${esc(p.desc)}</div>
+              <div class="product-bottom">
+                <span class="product-price">${p.price} BYN</span>
+                <a href="#order" class="btn-cart">заказать</a>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }).catch(() => {
+      document.getElementById('catalog-grid').innerHTML =
+        '<p style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:40px 0">Не удалось загрузить каталог</p>';
+    });
+  </script>
 </body>
 </html>
