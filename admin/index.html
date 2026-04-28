@@ -328,6 +328,21 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
+    }
+
+    .upload-progress {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .upload-progress-bar {
+      height: 100%;
+      background: var(--blue);
+      border-radius: 2px;
+      transition: width 0.2s;
     }
 
     .img-preview-box img {
@@ -457,12 +472,17 @@
         <button class="modal-close" id="modalCloseBtn">✕</button>
       </div>
 
-      <div class="img-preview-box">
+      <div class="img-preview-box" id="imgUploadArea">
         <img id="imgPreview" class="hidden" alt="preview">
         <div class="img-preview-placeholder" id="imgPlaceholder">
-          <div class="img-preview-icon">🌸</div>
-          <div class="img-preview-text">Превью появится после ввода ссылки</div>
+          <div class="img-preview-icon">📷</div>
+          <div class="img-preview-text">Нажми чтобы загрузить фото</div>
         </div>
+      </div>
+      <input type="file" id="imgFileInput" accept="image/*" class="hidden">
+
+      <div id="uploadProgress" class="upload-progress hidden" style="margin-bottom:12px">
+        <div class="upload-progress-bar" id="uploadProgressBar" style="width:0%"></div>
       </div>
 
       <div id="saveError" class="error-msg hidden" style="margin-bottom:14px"></div>
@@ -502,6 +522,9 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+
+    const CLOUDINARY_CLOUD = 'dsivge4co';
+    const CLOUDINARY_PRESET = 'h6bkhvxu';
 
     let editingId = null;
     let products = [];
@@ -652,6 +675,74 @@
     });
 
     $('imgPreview').addEventListener('error', () => setPreview(''));
+
+    // Cloudinary upload
+    $('imgUploadArea').addEventListener('click', () => $('imgFileInput').click());
+
+    $('imgFileInput').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      $('imgFileInput').value = '';
+
+      const errEl = $('saveError');
+      const progress = $('uploadProgress');
+      const bar = $('uploadProgressBar');
+
+      errEl.classList.add('hidden');
+      progress.classList.remove('hidden');
+      bar.style.width = '10%';
+
+      try {
+        const compressed = await compressImage(file);
+        bar.style.width = '40%';
+
+        const formData = new FormData();
+        formData.append('file', compressed);
+        formData.append('upload_preset', CLOUDINARY_PRESET);
+
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+          method: 'POST',
+          body: formData
+        });
+
+        bar.style.width = '90%';
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error?.message || 'Upload failed');
+
+        bar.style.width = '100%';
+        setTimeout(() => progress.classList.add('hidden'), 400);
+
+        $('fieldImageUrl').value = data.secure_url;
+        setPreview(data.secure_url);
+        showToast('Фото загружено');
+      } catch (err) {
+        progress.classList.add('hidden');
+        errEl.textContent = 'Ошибка загрузки фото. Попробуй ещё раз.';
+        errEl.classList.remove('hidden');
+        console.error(err);
+      }
+    });
+
+    function compressImage(file) {
+      return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            const max = 1200;
+            const ratio = Math.min(max / img.width, max / img.height, 1);
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(img.width * ratio);
+            canvas.height = Math.round(img.height * ratio);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(resolve, 'image/jpeg', 0.85);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
 
     // ===== SAVE =====
     $('saveBtn').addEventListener('click', async () => {
