@@ -435,377 +435,424 @@
 </head>
 <body>
 
-  <!-- LOGIN SCREEN -->
-  <div id="loginScreen">
-    <div class="login-logo">FLOWERROR</div>
-    <div class="login-sub">панель управления</div>
-    <form class="login-form" id="loginForm">
-      <div id="loginError" class="error-msg hidden"></div>
-      <input class="input" id="loginEmail" type="email" placeholder="email" autocomplete="email" required>
-      <input class="input" id="loginPassword" type="password" placeholder="пароль" autocomplete="current-password" required>
-      <button class="btn-primary" id="loginBtn" type="submit">Войти</button>
-    </form>
-  </div>
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-logo">FLOWERROR</div>
+  <div class="login-sub">панель управления</div>
+  <form class="login-form" id="loginForm">
+    <div id="loginError" class="error-msg hidden"></div>
+    <input class="input" id="loginEmail" type="email" placeholder="email" autocomplete="email" required>
+    <input class="input" id="loginPassword" type="password" placeholder="пароль" autocomplete="current-password" required>
+    <button class="btn-primary" id="loginBtn" type="submit">Войти</button>
+  </form>
+</div>
 
-  <!-- ADMIN SCREEN -->
-  <div id="adminScreen" class="hidden">
-    <header class="admin-header">
-      <div class="header-logo">FLOWERROR</div>
-      <button class="btn-logout" id="logoutBtn">Выйти</button>
-    </header>
+<!-- ADMIN SCREEN -->
+<div id="adminScreen" class="hidden">
+  <header class="admin-header">
+    <div class="header-logo">FLOWERROR</div>
+    <button class="btn-logout" id="logoutBtn">Выйти</button>
+  </header>
 
-    <div class="admin-content">
-      <div class="products-list" id="productsList">
-        <div class="loading"><div class="spinner"></div></div>
-      </div>
-    </div>
-
-    <button class="fab" id="fabBtn">+</button>
-  </div>
-
-  <!-- MODAL -->
-  <div id="modal" class="hidden">
-    <div class="modal-sheet">
-      <div class="modal-drag-handle"></div>
-      <div class="modal-header">
-        <div class="modal-title" id="modalTitle">Новая охапка</div>
-        <button class="modal-close" id="modalCloseBtn">✕</button>
-      </div>
-
-      <div class="img-preview-box" id="imgUploadArea">
-        <img id="imgPreview" class="hidden" alt="preview">
-        <div class="img-preview-placeholder" id="imgPlaceholder">
-          <div class="img-preview-icon">📷</div>
-          <div class="img-preview-text">Нажми чтобы загрузить фото</div>
-        </div>
-      </div>
-      <input type="file" id="imgFileInput" accept="image/*" class="hidden">
-
-      <div id="uploadProgress" class="upload-progress hidden" style="margin-bottom:12px">
-        <div class="upload-progress-bar" id="uploadProgressBar" style="width:0%"></div>
-      </div>
-
-      <div id="saveError" class="error-msg hidden" style="margin-bottom:14px"></div>
-
-      <div class="form-field" style="margin-bottom:20px">
-        <label class="form-label">Ссылка на фото</label>
-        <input class="input" id="fieldImageUrl" type="url" placeholder="https://..." autocomplete="off">
-      </div>
-
-      <div class="form-field">
-        <label class="form-label">Название</label>
-        <input class="input" id="fieldName" type="text" placeholder="лавандовый закат">
-      </div>
-
-      <div class="form-field">
-        <label class="form-label">Состав</label>
-        <input class="input" id="fieldDesc" type="text" placeholder="эустома, маттиола, эвкалипт">
-      </div>
-
-      <div class="form-field">
-        <label class="form-label">Цена (BYN)</label>
-        <input class="input" id="fieldPrice" type="number" inputmode="numeric" placeholder="75">
-      </div>
-
-      <button class="btn-primary" id="saveBtn" style="width:100%;margin-top:8px">Сохранить</button>
+  <div class="admin-content">
+    <div class="products-list" id="productsList">
+      <div class="loading"><div class="spinner"></div></div>
     </div>
   </div>
 
-  <!-- TOAST -->
-  <div id="toast"></div>
+  <button class="fab" id="fabBtn">+</button>
+</div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="../firebase-config.js"></script>
-  <script>
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+<!-- MODAL -->
+<div id="modal" class="hidden">
+  <div class="modal-sheet">
+    <div class="modal-drag-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Новая охапка</div>
+      <button class="modal-close" id="modalCloseBtn">✕</button>
+    </div>
 
-    const CLOUDINARY_CLOUD = 'dsivge4co';
-    const CLOUDINARY_PRESET = 'h6bkhvxu';
+    <div class="img-preview-box" id="imgUploadArea">
+      <img id="imgPreview" class="hidden" alt="preview">
+      <div class="img-preview-placeholder" id="imgPlaceholder">
+        <div class="img-preview-icon">📷</div>
+        <div class="img-preview-text">Нажми чтобы загрузить фото</div>
+      </div>
+    </div>
+    <input type="file" id="imgFileInput" accept="image/*" class="hidden">
 
-    let editingId = null;
-    let products = [];
+    <div id="uploadProgress" class="upload-progress hidden" style="margin-bottom:12px">
+      <div class="upload-progress-bar" id="uploadProgressBar" style="width:0%"></div>
+    </div>
 
-    const $ = id => document.getElementById(id);
+    <div id="saveError" class="error-msg hidden" style="margin-bottom:14px"></div>
 
-    // ===== AUTH =====
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        $('loginScreen').classList.add('hidden');
-        $('adminScreen').classList.remove('hidden');
-        loadProducts();
-      } else {
-        $('loginScreen').classList.remove('hidden');
-        $('adminScreen').classList.add('hidden');
-      }
-    });
+    <div class="form-field" style="margin-bottom:20px">
+      <label class="form-label">Ссылка на фото</label>
+      <input class="input" id="fieldImageUrl" type="url" placeholder="https://..." autocomplete="off">
+    </div>
 
-    $('loginForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const errEl = $('loginError');
-      errEl.classList.add('hidden');
-      const btn = $('loginBtn');
-      btn.disabled = true;
-      btn.textContent = 'Входим...';
-      try {
-        await auth.signInWithEmailAndPassword($('loginEmail').value, $('loginPassword').value);
-      } catch {
-        errEl.textContent = 'Неверный email или пароль';
-        errEl.classList.remove('hidden');
-        btn.disabled = false;
-        btn.textContent = 'Войти';
-      }
-    });
+    <div class="form-field">
+      <label class="form-label">Название</label>
+      <input class="input" id="fieldName" type="text" placeholder="лавандовый закат">
+    </div>
 
-    $('logoutBtn').addEventListener('click', () => auth.signOut());
+    <div class="form-field">
+      <label class="form-label">Состав</label>
+      <input class="input" id="fieldDesc" type="text" placeholder="эустома, маттиола, эвкалипт">
+    </div>
 
-    // ===== LOAD PRODUCTS =====
-    async function loadProducts() {
-      $('productsList').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-      try {
-        const snap = await db.collection('products').orderBy('createdAt', 'desc').get();
-        products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderProducts();
-      } catch {
-        $('productsList').innerHTML = '<div class="empty-state"><div class="empty-text">Ошибка загрузки. Обнови страницу.</div></div>';
-      }
+    <div class="form-field">
+      <label class="form-label">Цена (BYN)</label>
+      <input class="input" id="fieldPrice" type="number" inputmode="numeric" placeholder="75">
+    </div>
+
+    <!-- NEW: checkbox "без цены" -->
+    <div class="form-field" style="margin-top:-6px; display:flex; align-items:center; gap:10px;">
+      <input type="checkbox" id="fieldNoPrice" style="width:18px; height:18px;">
+      <label for="fieldNoPrice" style="font-size:14px; color:var(--text-secondary);">Без цены</label>
+    </div>
+
+    <button class="btn-primary" id="saveBtn" style="width:100%;margin-top:8px">Сохранить</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="../firebase-config.js"></script>
+
+<script>
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  const CLOUDINARY_CLOUD = 'dsivge4co';
+  const CLOUDINARY_PRESET = 'h6bkhvxu';
+
+  let editingId = null;
+  let products = [];
+
+  const $ = id => document.getElementById(id);
+
+  // ===== AUTH =====
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      $('loginScreen').classList.add('hidden');
+      $('adminScreen').classList.remove('hidden');
+      loadProducts();
+    } else {
+      $('loginScreen').classList.remove('hidden');
+      $('adminScreen').classList.add('hidden');
+    }
+  });
+
+  $('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const errEl = $('loginError');
+    errEl.classList.add('hidden');
+    const btn = $('loginBtn');
+    btn.disabled = true;
+    btn.textContent = 'Входим...';
+    try {
+      await auth.signInWithEmailAndPassword($('loginEmail').value, $('loginPassword').value);
+    } catch {
+      errEl.textContent = 'Неверный email или пароль';
+      errEl.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Войти';
+    }
+  });
+
+  $('logoutBtn').addEventListener('click', () => auth.signOut());
+
+  // ===== LOAD PRODUCTS =====
+  async function loadProducts() {
+    $('productsList').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    try {
+      const snap = await db.collection('products').orderBy('createdAt', 'desc').get();
+      products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderProducts();
+    } catch {
+      $('productsList').innerHTML = '<div class="empty-state"><div class="empty-text">Ошибка загрузки. Обнови страницу.</div></div>';
+    }
+  }
+
+  function renderProducts() {
+    if (products.length === 0) {
+      $('productsList').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🌸</div>
+        <div class="empty-text">Нет охапок.<br>Нажми + чтобы добавить первую.</div>
+      </div>`;
+      return;
     }
 
-    function renderProducts() {
-      if (products.length === 0) {
-        $('productsList').innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">🌸</div>
-            <div class="empty-text">Нет охапок.<br>Нажми + чтобы добавить первую.</div>
-          </div>`;
-        return;
-      }
-      $('productsList').innerHTML = products.map(p => `
-        <div class="product-row">
-          ${p.imageUrl
+    $('productsList').innerHTML = products.map(p => `
+    <div class="product-row">
+      ${p.imageUrl
             ? `<img class="product-row-img" src="${esc(p.imageUrl)}" alt="${esc(p.name)}">`
             : `<div class="product-row-img-placeholder">🌸</div>`
-          }
-          <div class="product-row-info">
-            <div class="product-row-name">${esc(p.name)}</div>
-            <div class="product-row-desc">${esc(p.desc)}</div>
-            <div class="product-row-price">${p.price} BYN</div>
-          </div>
-          <div class="product-row-actions">
-            <button class="btn-edit" onclick="openEditModal('${p.id}')">изм.</button>
-            <button class="btn-delete" onclick="deleteProduct('${p.id}')">удал.</button>
-          </div>
-        </div>
-      `).join('');
     }
+      <div class="product-row-info">
+        <div class="product-row-name">${esc(p.name)}</div>
+        <div class="product-row-desc">${esc(p.desc)}</div>
+        ${p.price ? `<div class="product-row-price">${p.price} BYN</div>` : ''}
+      </div>
+      <div class="product-row-actions">
+        <button class="btn-edit" onclick="openEditModal('${p.id}')">изм.</button>
+        <button class="btn-delete" onclick="deleteProduct('${p.id}')">удал.</button>
+      </div>
+    </div>
+  `).join('');
+  }
 
-    // ===== DELETE =====
-    async function deleteProduct(id) {
-      if (!confirm('Удалить охапку?')) return;
-      try {
-        await db.collection('products').doc(id).delete();
-        products = products.filter(p => p.id !== id);
-        renderProducts();
-        showToast('Удалено');
-      } catch {
-        showToast('Ошибка удаления');
-      }
+  // ===== DELETE =====
+  async function deleteProduct(id) {
+    if (!confirm('Удалить охапку?')) return;
+    try {
+      await db.collection('products').doc(id).delete();
+      products = products.filter(p => p.id !== id);
+      renderProducts();
+      showToast('Удалено');
+    } catch {
+      showToast('Ошибка удаления');
     }
+  }
 
-    // ===== MODAL =====
-    $('fabBtn').addEventListener('click', () => openAddModal());
-    $('modalCloseBtn').addEventListener('click', closeModal);
-    $('modal').addEventListener('click', e => { if (e.target === $('modal')) closeModal(); });
+  // ===== MODAL =====
+  $('fabBtn').addEventListener('click', () => openAddModal());
+  $('modalCloseBtn').addEventListener('click', closeModal);
+  $('modal').addEventListener('click', e => { if (e.target === $('modal')) closeModal(); });
 
-    function openAddModal() {
-      editingId = null;
-      $('modalTitle').textContent = 'Новая охапка';
-      $('fieldImageUrl').value = '';
-      $('fieldName').value = '';
-      $('fieldDesc').value = '';
+  function openAddModal() {
+    editingId = null;
+    $('modalTitle').textContent = 'Новая охапка';
+    $('fieldImageUrl').value = '';
+    $('fieldName').value = '';
+    $('fieldDesc').value = '';
+    $('fieldPrice').value = '';
+    $('fieldNoPrice').checked = false;
+    $('fieldPrice').disabled = false;
+
+    setPreview('');
+    $('saveError').classList.add('hidden');
+    $('modal').classList.remove('hidden');
+    setTimeout(() => $('fieldImageUrl').focus(), 300);
+  }
+
+  function openEditModal(id) {
+    const p = products.find(p => p.id === id);
+    if (!p) return;
+
+    editingId = id;
+    $('modalTitle').textContent = 'Редактировать';
+
+    $('fieldImageUrl').value = p.imageUrl ?? '';
+    $('fieldName').value = p.name;
+    $('fieldDesc').value = p.desc;
+
+    if (!p.price) {
+      $('fieldNoPrice').checked = true;
+      $('fieldPrice').disabled = true;
       $('fieldPrice').value = '';
-      setPreview('');
-      $('saveError').classList.add('hidden');
-      $('modal').classList.remove('hidden');
-      setTimeout(() => $('fieldImageUrl').focus(), 300);
-    }
-
-    function openEditModal(id) {
-      const p = products.find(p => p.id === id);
-      if (!p) return;
-      editingId = id;
-      $('modalTitle').textContent = 'Редактировать';
-      $('fieldImageUrl').value = p.imageUrl ?? '';
-      $('fieldName').value = p.name;
-      $('fieldDesc').value = p.desc;
+    } else {
+      $('fieldNoPrice').checked = false;
+      $('fieldPrice').disabled = false;
       $('fieldPrice').value = p.price;
-      setPreview(p.imageUrl);
-      $('saveError').classList.add('hidden');
-      $('modal').classList.remove('hidden');
     }
 
-    function closeModal() {
-      $('modal').classList.add('hidden');
+    setPreview(p.imageUrl);
+    $('saveError').classList.add('hidden');
+    $('modal').classList.remove('hidden');
+  }
+
+  function closeModal() {
+    $('modal').classList.add('hidden');
+  }
+
+  function setPreview(url) {
+    const preview = $('imgPreview');
+    const placeholder = $('imgPlaceholder');
+    if (url) {
+      preview.src = url;
+      preview.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+    } else {
+      preview.src = '';
+      preview.classList.add('hidden');
+      placeholder.classList.remove('hidden');
     }
+  }
 
-    function setPreview(url) {
-      const preview = $('imgPreview');
-      const placeholder = $('imgPlaceholder');
-      if (url) {
-        preview.src = url;
-        preview.classList.remove('hidden');
-        placeholder.classList.add('hidden');
-      } else {
-        preview.src = '';
-        preview.classList.add('hidden');
-        placeholder.classList.remove('hidden');
-      }
+  // Live preview on URL input
+  let previewTimer;
+  $('fieldImageUrl').addEventListener('input', e => {
+    clearTimeout(previewTimer);
+    const url = e.target.value.trim();
+    if (!url) { setPreview(''); return; }
+    previewTimer = setTimeout(() => setPreview(url), 600);
+  });
+
+  $('imgPreview').addEventListener('error', () => setPreview(''));
+
+  // ===== CHECKBOX "БЕЗ ЦЕНЫ" =====
+  $('fieldNoPrice').addEventListener('change', e => {
+    if (e.target.checked) {
+      $('fieldPrice').disabled = true;
+      $('fieldPrice').value = '';
+    } else {
+      $('fieldPrice').disabled = false;
     }
+  });
 
-    // Live preview on URL input
-    let previewTimer;
-    $('fieldImageUrl').addEventListener('input', e => {
-      clearTimeout(previewTimer);
-      const url = e.target.value.trim();
-      if (!url) { setPreview(''); return; }
-      previewTimer = setTimeout(() => setPreview(url), 600);
-    });
+  // ===== CLOUDINARY UPLOAD =====
+  $('imgUploadArea').addEventListener('click', () => $('imgFileInput').click());
 
-    $('imgPreview').addEventListener('error', () => setPreview(''));
+  $('imgFileInput').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    $('imgFileInput').value = '';
 
-    // Cloudinary upload
-    $('imgUploadArea').addEventListener('click', () => $('imgFileInput').click());
+    const errEl = $('saveError');
+    const progress = $('uploadProgress');
+    const bar = $('uploadProgressBar');
 
-    $('imgFileInput').addEventListener('change', async e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      $('imgFileInput').value = '';
+    errEl.classList.add('hidden');
+    progress.classList.remove('hidden');
+    bar.style.width = '10%';
 
-      const errEl = $('saveError');
-      const progress = $('uploadProgress');
-      const bar = $('uploadProgressBar');
+    try {
+      const compressed = await compressImage(file);
+      bar.style.width = '40%';
 
-      errEl.classList.add('hidden');
-      progress.classList.remove('hidden');
-      bar.style.width = '10%';
+      const formData = new FormData();
+      formData.append('file', compressed);
+      formData.append('upload_preset', CLOUDINARY_PRESET);
 
-      try {
-        const compressed = await compressImage(file);
-        bar.style.width = '40%';
-
-        const formData = new FormData();
-        formData.append('file', compressed);
-        formData.append('upload_preset', CLOUDINARY_PRESET);
-
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
-          method: 'POST',
-          body: formData
-        });
-
-        bar.style.width = '90%';
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data.error?.message || 'Upload failed');
-
-        bar.style.width = '100%';
-        setTimeout(() => progress.classList.add('hidden'), 400);
-
-        $('fieldImageUrl').value = data.secure_url;
-        setPreview(data.secure_url);
-        showToast('Фото загружено');
-      } catch (err) {
-        progress.classList.add('hidden');
-        errEl.textContent = 'Ошибка загрузки фото. Попробуй ещё раз.';
-        errEl.classList.remove('hidden');
-        console.error(err);
-      }
-    });
-
-    function compressImage(file) {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          const img = new Image();
-          img.onload = () => {
-            const max = 1200;
-            const ratio = Math.min(max / img.width, max / img.height, 1);
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.round(img.width * ratio);
-            canvas.height = Math.round(img.height * ratio);
-            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(resolve, 'image/jpeg', 0.85);
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+        method: 'POST',
+        body: formData
       });
+
+      bar.style.width = '90%';
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error?.message || 'Upload failed');
+
+      bar.style.width = '100%';
+      setTimeout(() => progress.classList.add('hidden'), 400);
+
+      $('fieldImageUrl').value = data.secure_url;
+      setPreview(data.secure_url);
+      showToast('Фото загружено');
+    } catch (err) {
+      progress.classList.add('hidden');
+      errEl.textContent = 'Ошибка загрузки фото. Попробуй ещё раз.';
+      errEl.classList.remove('hidden');
+      console.error(err);
     }
+  });
 
-    // ===== SAVE =====
-    $('saveBtn').addEventListener('click', async () => {
-      const imageUrl = $('fieldImageUrl').value.trim();
-      const name = $('fieldName').value.trim();
-      const desc = $('fieldDesc').value.trim();
-      const price = parseInt($('fieldPrice').value);
-      const errEl = $('saveError');
-
-      if (!name || !desc || !price || price <= 0) {
-        errEl.textContent = 'Заполни все поля';
-        errEl.classList.remove('hidden');
-        return;
-      }
-
-      const btn = $('saveBtn');
-      btn.disabled = true;
-      btn.textContent = 'Сохраняем...';
-      errEl.classList.add('hidden');
-
-      try {
-        const data = { name, desc, price, imageUrl };
-
-        if (editingId) {
-          await db.collection('products').doc(editingId).update(data);
-          const idx = products.findIndex(p => p.id === editingId);
-          if (idx !== -1) products[idx] = { ...products[idx], ...data };
-          showToast('Сохранено');
-        } else {
-          data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-          const ref = await db.collection('products').add(data);
-          products.unshift({ id: ref.id, ...data });
-          showToast('Охапка добавлена');
-        }
-
-        renderProducts();
-        closeModal();
-      } catch (err) {
-        console.error(err);
-        errEl.textContent = 'Ошибка сохранения. Попробуй ещё раз.';
-        errEl.classList.remove('hidden');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Сохранить';
-      }
+  function compressImage(file) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const max = 1200;
+          const ratio = Math.min(max / img.width, max / img.height, 1);
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.width * ratio);
+          canvas.height = Math.round(img.height * ratio);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(resolve, 'image/jpeg', 0.85);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     });
+  }
 
-    // ===== TOAST =====
-    function showToast(msg) {
-      const t = $('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2200);
+  // ===== SAVE =====
+  $('saveBtn').addEventListener('click', async () => {
+    const imageUrl = $('fieldImageUrl').value.trim();
+    const name = $('fieldName').value.trim();
+    const desc = $('fieldDesc').value.trim();
+    const price = parseInt($('fieldPrice').value);
+    const noPrice = $('fieldNoPrice').checked;
+    const errEl = $('saveError');
+
+    if (!name || !desc) {
+      errEl.textContent = 'Заполни название и состав';
+      errEl.classList.remove('hidden');
+      return;
     }
 
-    // ===== UTILS =====
-    function esc(str) {
-      return String(str ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+    if (!noPrice && (!price || price <= 0)) {
+      errEl.textContent = 'Укажи цену или выбери "без цены"';
+      errEl.classList.remove('hidden');
+      return;
     }
-  </script>
+
+    const btn = $('saveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Сохраняем...';
+    errEl.classList.add('hidden');
+
+    try {
+      const data = {
+        name,
+        desc,
+        imageUrl,
+        price: noPrice ? null : price
+      };
+
+      if (editingId) {
+        await db.collection('products').doc(editingId).update(data);
+        const idx = products.findIndex(p => p.id === editingId);
+        if (idx !== -1) products[idx] = { ...products[idx], ...data };
+        showToast('Сохранено');
+      } else {
+        data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        const ref = await db.collection('products').add(data);
+        products.unshift({ id: ref.id, ...data });
+        showToast('Охапка добавлена');
+      }
+
+      renderProducts();
+      closeModal();
+    } catch (err) {
+      console.error(err);
+      errEl.textContent = 'Ошибка сохранения. Попробуй ещё раз.';
+      errEl.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Сохранить';
+    }
+  });
+
+  // ===== TOAST =====
+  function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // ===== UTILS =====
+  function esc(str) {
+    return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+  }
+</script>
+
 </body>
 </html>
+
