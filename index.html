@@ -832,7 +832,7 @@
               <div class="product-name">${esc(p.name)}</div>
               <div class="product-desc">${esc(p.desc)}</div>
               <div class="product-bottom">
-                <span class="product-price">${p.price} BYN</span>
+                ${p.price ? `<span class="product-price">${p.price} BYN</span>` : ''}
                 <a href="#order" class="btn-cart">заказать</a>
               </div>
             </div>
